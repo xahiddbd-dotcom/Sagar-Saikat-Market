@@ -1,6 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
-import { fetchMarketUpdates } from '../services/geminiService';
+import React from 'react';
 import { MarketNews } from '../types';
 
 interface NewsSectionProps {
@@ -9,75 +8,52 @@ interface NewsSectionProps {
 }
 
 const NewsSection: React.FC<NewsSectionProps> = ({ initialNews, onNewsUpdate }) => {
-  const [loading, setLoading] = useState(initialNews.length === 0);
-
-  const loadNews = async () => {
-    setLoading(true);
-    const latestNews = await fetchMarketUpdates();
-    if (latestNews.length > 0) {
-      onNewsUpdate(latestNews);
-    }
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    if (initialNews.length === 0) {
-      loadNews();
-    }
-  }, []);
-
   return (
-    <section className="py-12" id="news-section">
-      <div className="flex items-center justify-between mb-8">
-        <div className="flex items-center gap-4">
-          <h2 className="text-2xl font-bold text-gray-900 border-l-4 border-blue-800 pl-4">মার্কেট আপডেট ও সংবাদ (ব্লগ)</h2>
-          <span className="bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded-full font-bold animate-pulse flex items-center gap-1">
-            <span className="w-1.5 h-1.5 bg-blue-600 rounded-full"></span> লাইভ আপডেট
-          </span>
+    <section className="py-20" id="news-section">
+      <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
+        <div>
+          <h2 className="text-3xl font-black text-gray-900 tracking-tighter mb-2 italic border-l-8 border-blue-800 pl-6">মার্কেট আপডেট ও সংবাদ (ব্লগ)</h2>
+          <p className="text-sm text-gray-400 font-bold uppercase tracking-[0.2em] ml-6">Daily Market Bulletin & Blogging</p>
         </div>
-        <button onClick={loadNews} disabled={loading} className="flex items-center gap-2 text-blue-800 hover:text-blue-900 font-semibold text-sm bg-blue-50 px-4 py-2 rounded-lg transition-colors disabled:opacity-50">
-          {loading ? 'লোড হচ্ছে...' : 'রিফ্রেশ করুন'}
-          <svg className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
-        </button>
+        <div className="flex items-center gap-2 bg-blue-50 px-4 py-2 rounded-full border border-blue-100">
+           <span className="w-2 h-2 bg-blue-600 rounded-full animate-pulse"></span>
+           <span className="text-[10px] font-black text-blue-800 uppercase tracking-widest">লাইভ নিউজ ফিড</span>
+        </div>
       </div>
 
-      {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {[1, 2, 3].map(i => (
-            <div key={i} className="bg-white rounded-xl h-80 animate-pulse border border-gray-100">
-              <div className="bg-gray-200 h-40 w-full rounded-t-xl"></div>
-              <div className="p-4 space-y-3">
-                <div className="h-4 bg-gray-200 rounded w-1/4"></div>
-                <div className="h-6 bg-gray-200 rounded w-full"></div>
-              </div>
-            </div>
-          ))}
-        </div>
-      ) : initialNews.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {initialNews.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
           {initialNews.map((news) => (
-            <article key={news.id} className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow border border-gray-100 group">
-              <div className="relative h-48 overflow-hidden">
-                <img src={news.imageUrl} alt={news.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-                <span className="absolute top-4 left-4 bg-blue-800 text-white text-xs px-2 py-1 rounded font-bold uppercase tracking-wider">{news.category || 'মার্কেট সংবাদ'}</span>
+            <article key={news.id} className="bg-white rounded-[40px] overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-700 border border-gray-100 group flex flex-col h-full">
+              <div className="relative h-60 overflow-hidden shrink-0">
+                <img src={news.imageUrl} alt={news.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                <span className="absolute bottom-6 left-6 bg-blue-800 text-white text-[10px] px-3 py-1 rounded-full font-black uppercase tracking-widest shadow-xl">{news.category || 'মার্কেট সংবাদ'}</span>
               </div>
-              <div className="p-6">
-                <div className="text-xs text-gray-400 mb-2 flex items-center gap-2">
-                  <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              <div className="p-8 flex flex-col flex-1">
+                <div className="text-[10px] text-gray-400 mb-4 flex items-center gap-2 font-bold uppercase tracking-widest">
+                  <svg className="w-4 h-4 text-blue-800" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                   {news.date}
                 </div>
-                <h3 className="text-lg font-bold text-gray-900 mb-3 leading-tight group-hover:text-blue-800 transition-colors line-clamp-2 min-h-[3.5rem]">{news.title}</h3>
-                <p className="text-gray-600 text-sm line-clamp-3 mb-4 min-h-[4.5rem]">{news.summary}</p>
-                <div className="flex items-center justify-between mt-auto pt-4 border-t border-gray-50">
-                  <a href={news.sourceUrl} target="_blank" rel="noopener noreferrer" className="text-xs font-bold text-blue-800 hover:text-blue-900 flex items-center gap-1 group/link">বিস্তারিত পড়ুন <svg className="w-3 h-3 transition-transform group-hover/link:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg></a>
+                <h3 className="text-xl font-black text-gray-900 mb-4 leading-tight group-hover:text-blue-800 transition-colors line-clamp-2">{news.title}</h3>
+                <p className="text-gray-500 text-sm line-clamp-4 leading-relaxed font-medium mb-8">{news.summary}</p>
+                <div className="mt-auto pt-6 border-t border-gray-50 flex items-center justify-between">
+                  <button className="text-[10px] font-black text-blue-800 uppercase tracking-widest flex items-center gap-2 group/btn">
+                    পুরো খবরটি পড়ুন 
+                    <svg className="w-4 h-4 transform group-hover/btn:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+                  </button>
+                  <span className="text-[8px] font-black text-gray-300 uppercase italic">Admin Post</span>
                 </div>
               </div>
             </article>
           ))}
         </div>
       ) : (
-        <div className="text-center py-12 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
-          <p className="text-gray-500">কোনো আপডেট পাওয়া যায়নি।</p>
+        <div className="text-center py-20 bg-gray-50 rounded-[40px] border-4 border-dashed border-gray-100">
+           <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <svg className="w-10 h-10 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2" /></svg>
+           </div>
+           <p className="text-gray-400 font-black uppercase tracking-widest text-sm">বর্তমানে কোনো নিউজ আপডেট নেই</p>
         </div>
       )}
     </section>
