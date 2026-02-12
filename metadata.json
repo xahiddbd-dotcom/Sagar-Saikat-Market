@@ -1,0 +1,7 @@
+{
+  "name": "Sagar Saikat Market - Digital Directory",
+  "description": "A comprehensive digital management system for Sagar Saikat Market, featuring shop profiles, coaching centers, and AI-powered visitor assistance.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
