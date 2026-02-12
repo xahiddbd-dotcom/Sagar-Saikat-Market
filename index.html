@@ -7,6 +7,14 @@
     <title>সাগর সৈকত মার্কেট - ডিজিটাল ডিরেক্টরি</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        // Fix for "process is not defined" error in browser environments (like Vercel static)
+        window.process = { 
+            env: { 
+                API_KEY: "" 
+            } 
+        };
+    </script>
     <style>
         body {
             font-family: 'Hind Siliguri', sans-serif;
@@ -73,5 +81,7 @@
 </head>
 <body>
     <div id="root"></div>
+    <!-- Explicitly load the index.tsx module for environments that don't auto-import -->
+    <script type="module" src="./index.tsx"></script>
 </body>
 </html>

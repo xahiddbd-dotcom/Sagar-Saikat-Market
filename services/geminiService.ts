@@ -1,10 +1,22 @@
 
 import { GoogleGenAI, Type } from "@google/genai";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// Safe API Key retrieval for Vercel/Browser environments
+const getApiKey = () => {
+  try {
+    return process.env.API_KEY || "";
+  } catch (e) {
+    return "";
+  }
+};
+
+const ai = new GoogleGenAI({ apiKey: getApiKey() });
 
 export const getMarketAssistantResponse = async (query: string) => {
   try {
+    const key = getApiKey();
+    if (!key) return "সিস্টেম কনফিগারেশনে সমস্যা হয়েছে। দয়া করে অ্যাডমিনের সাথে যোগাযোগ করুন।";
+
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
       contents: query,
@@ -28,6 +40,9 @@ export const getMarketAssistantResponse = async (query: string) => {
 
 export const fetchMarketUpdates = async () => {
   try {
+    const key = getApiKey();
+    if (!key) return [];
+
     const prompt = `বাংলাদেশের ব্যবসা বা বাণিজ্য সংক্রান্ত ৫টি সাম্প্রতিক সংবাদ বা সাগর সৈকত মার্কেটের মতো বড় শপিং কমপ্লেক্সের জন্য উপযোগী ৫টি আপডেট দিন।`;
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
