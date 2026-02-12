@@ -1,22 +1,14 @@
 
 import { GoogleGenAI, Type } from "@google/genai";
 
-// Safe API Key retrieval for Vercel/Browser environments
-const getApiKey = () => {
-  try {
-    return process.env.API_KEY || "";
-  } catch (e) {
-    return "";
-  }
-};
-
-const ai = new GoogleGenAI({ apiKey: getApiKey() });
+/**
+ * Initialize the Gemini API client.
+ * In Vercel, process.env.API_KEY must be set in the project settings.
+ */
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || "" });
 
 export const getMarketAssistantResponse = async (query: string) => {
   try {
-    const key = getApiKey();
-    if (!key) return "সিস্টেম কনফিগারেশনে সমস্যা হয়েছে। দয়া করে অ্যাডমিনের সাথে যোগাযোগ করুন।";
-
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
       contents: query,
@@ -28,22 +20,19 @@ export const getMarketAssistantResponse = async (query: string) => {
           - Right: Selim Book House, Jewel Enterprise, Raja Computer, Sabab Enterprise, Arvin Studio, RJ Computer, Tax Lawyer, Selim Store, Water Purifier, Huzur Saiful Bhai.
         - 2nd Floor (২য় তলা): Occupied by Medico Coaching Center (৯৮% জায়গা) and Professional Cake Skill Development Coaching (২% জায়গা).
         - Higher Floors (৩য়-৬ষ্ঠ তলা): Language centers, BCS prep, and IT training.
-        Always respond in Bengali. Provide accurate floor and row details.`,
+        Always respond in Bengali. Be professional and helpful.`,
       },
     });
     return response.text;
   } catch (error) {
-    console.error("Gemini Error:", error);
-    return "দুঃখিত, এআই অ্যাসিস্ট্যান্ট কাজ করছে না। দয়া করে মার্কেট রিসেপশনে যোগাযোগ করুন।";
+    console.error("Gemini Assistant Error:", error);
+    return "দুঃখিত, এআই অ্যাসিস্ট্যান্ট বর্তমানে ব্যস্ত আছে। দয়া করে একটু পর আবার চেষ্টা করুন।";
   }
 };
 
 export const fetchMarketUpdates = async () => {
   try {
-    const key = getApiKey();
-    if (!key) return [];
-
-    const prompt = `বাংলাদেশের ব্যবসা বা বাণিজ্য সংক্রান্ত ৫টি সাম্প্রতিক সংবাদ বা সাগর সৈকত মার্কেটের মতো বড় শপিং কমপ্লেক্সের জন্য উপযোগী ৫টি আপডেট দিন।`;
+    const prompt = `বাংলাদেশের ব্যবসা বা বাণিজ্য সংক্রান্ত ৫টি সাম্প্রতিক নিউজ বা সাগর সৈকত মার্কেটের মতো বড় শপিং কমপ্লেক্সের জন্য উপযোগী ৫টি আপডেট দিন। JSON ফরম্যাটে দিন।`;
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
       contents: prompt,
@@ -57,15 +46,18 @@ export const fetchMarketUpdates = async () => {
               title: { type: Type.STRING },
               summary: { type: Type.STRING },
               category: { type: Type.STRING },
-              sourceName: { type: Type.STRING },
-              sourceUrl: { type: Type.STRING }
+              sourceName: { type: Type.STRING }
             },
             required: ["title", "summary"]
           }
         }
       },
     });
-    const newsData = JSON.parse(response.text?.trim() || '[]');
+    
+    const text = response.text;
+    if (!text) return [];
+    
+    const newsData = JSON.parse(text.trim());
     return newsData.map((item: any, index: number) => ({
       ...item,
       id: `m-news-${index}`,
