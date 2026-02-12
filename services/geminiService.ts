@@ -1,14 +1,15 @@
 
 import { GoogleGenAI, Type } from "@google/genai";
 
-/**
- * Initialize the Gemini API client.
- * In Vercel, process.env.API_KEY must be set in the project settings.
- */
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || "" });
+// Ensure we pick up the API key correctly from Vercel environment variables
+const API_KEY = process.env.API_KEY || "";
+const ai = new GoogleGenAI({ apiKey: API_KEY });
 
 export const getMarketAssistantResponse = async (query: string) => {
   try {
+    if (!API_KEY) {
+      return "সিস্টেম কনফিগারেশনে সমস্যা হয়েছে (API Key Missing)। দয়া করে অ্যাডমিনের সাথে যোগাযোগ করুন।";
+    }
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
       contents: query,
@@ -32,6 +33,7 @@ export const getMarketAssistantResponse = async (query: string) => {
 
 export const fetchMarketUpdates = async () => {
   try {
+    if (!API_KEY) return [];
     const prompt = `বাংলাদেশের ব্যবসা বা বাণিজ্য সংক্রান্ত ৫টি সাম্প্রতিক নিউজ বা সাগর সৈকত মার্কেটের মতো বড় শপিং কমপ্লেক্সের জন্য উপযোগী ৫টি আপডেট দিন। JSON ফরম্যাটে দিন।`;
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
