@@ -1,15 +1,23 @@
 
 import { GoogleGenAI, Type } from "@google/genai";
 
-// Ensure we pick up the API key correctly from Vercel environment variables
-const API_KEY = process.env.API_KEY || "";
-const ai = new GoogleGenAI({ apiKey: API_KEY });
+/**
+ * Vite will replace process.env.API_KEY during the build process.
+ * In Vercel, make sure to add API_KEY in the Environment Variables section.
+ */
+const getApiKey = () => {
+  // Vite's 'define' will handle this. We fallback to an empty string to avoid crashes.
+  return process.env.API_KEY || "";
+};
 
 export const getMarketAssistantResponse = async (query: string) => {
+  const apiKey = getApiKey();
+  if (!apiKey) {
+    return "সিস্টেম কনফিগারেশনে সমস্যা (API Key missing)। দয়া করে Vercel Settings-এ API_KEY যুক্ত করুন।";
+  }
+
   try {
-    if (!API_KEY) {
-      return "সিস্টেম কনফিগারেশনে সমস্যা হয়েছে (API Key Missing)। দয়া করে অ্যাডমিনের সাথে যোগাযোগ করুন।";
-    }
+    const ai = new GoogleGenAI({ apiKey });
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
       contents: query,
@@ -32,8 +40,11 @@ export const getMarketAssistantResponse = async (query: string) => {
 };
 
 export const fetchMarketUpdates = async () => {
+  const apiKey = getApiKey();
+  if (!apiKey) return [];
+
   try {
-    if (!API_KEY) return [];
+    const ai = new GoogleGenAI({ apiKey });
     const prompt = `বাংলাদেশের ব্যবসা বা বাণিজ্য সংক্রান্ত ৫টি সাম্প্রতিক নিউজ বা সাগর সৈকত মার্কেটের মতো বড় শপিং কমপ্লেক্সের জন্য উপযোগী ৫টি আপডেট দিন। JSON ফরম্যাটে দিন।`;
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
